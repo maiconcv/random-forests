@@ -6,6 +6,9 @@ class DataInstance:
         self.attributes = attributes
         self.target = target
 
+    def __repr__(self):
+        return str(self)
+
     def __str__(self) -> str:
         return 'DataInstance{' \
                'attributes=' + str(self.attributes) + \
