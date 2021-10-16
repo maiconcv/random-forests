@@ -1,7 +1,7 @@
 import sys
 import csv
 from typing import List, Tuple
-from datainstance import DataInstance
+from .datainstance import DataInstance
 
 
 def get_file_name() -> str:

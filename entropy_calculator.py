@@ -64,7 +64,7 @@ class EntropyCalculator(object):
             CLASS_DATA_INSTANCES = self.__get_all_data_instances_for_class(attr_idx, c)
             NUM_DATA_INSTANCES_FOR_CLASS = len(CLASS_DATA_INSTANCES)
             attr_entropy += (NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES) \
-                        * calculate_entropy_class(CLASS_DATA_INSTANCES)
+                        * self.__calculate_entropy_class(CLASS_DATA_INSTANCES)
         
         return attr_entropy
     
@@ -115,13 +115,13 @@ class EntropyCalculator(object):
         """
         Calculates the entropy for the data_instances in a given class.
         """
-        TARGET_CLASSES = __get_target_classes(data_instances)
+        TARGET_CLASSES = self.__get_target_classes(data_instances)
         NUM_DATA_INSTANCES = len(data_instances)
     
         class_entropy = 0
     
         for c in TARGET_CLASSES:
-            CLASS_DATA_INSTANCES = __get_all_data_instances_for_target_class(data_instances, c)
+            CLASS_DATA_INSTANCES = self.__get_all_data_instances_for_target_class(data_instances, c)
             NUM_DATA_INSTANCES_FOR_CLASS = len(CLASS_DATA_INSTANCES)
             class_entropy -= (NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES) * \
                         math.log2(NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES)
