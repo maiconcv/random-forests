@@ -11,7 +11,6 @@ class Attribute(object):
         else:
             raise Exception("Invalid metadata type")
 
-    
     def __str__(self) -> str:
         return "Attribute(" \
             "name=" + self.name + \
@@ -19,11 +18,10 @@ class Attribute(object):
             ", type=" + self.attr_type + \
             "}" 
 
-    
     def __repr__(self) -> str:
         return str(self)
 
-        
+
 class DataInstance:
     def __init__(self, attributes: List[Attribute], target: str):
         self.attributes = attributes

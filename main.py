@@ -4,7 +4,6 @@ from typing import List, Tuple
 from pathlib import Path
 from .datainstance import DataInstance, Attribute
 
-
 def get_file_name() -> str:
     try:
         return sys.argv[1]

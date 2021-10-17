@@ -12,13 +12,11 @@ class EntropyCalculator(object):
         self.TARGET_INFORMATION_VALUE = self._calculate_entropy_target()
         self.NUM_ATTRIBUTES = len(self.DATA_INSTANCES[0].attributes)
     
-    
     def gain_ID3(self, attr_idx: int) -> float:
         """
         Calculates the information gain for a given data_instances and attribute
         """
         return self.TARGET_INFORMATION_VALUE - self._calculate_entropy_attribute(attr_idx)
-    
     
     def best_attribute(self) -> int:
         """
@@ -30,7 +28,6 @@ class EntropyCalculator(object):
             info_gain_list.append(self.gain_ID3(idx))
 
         return info_gain_list.index(max(info_gain_list))
-
 
     def _calculate_entropy_target(self) -> float:
         """
@@ -48,7 +45,6 @@ class EntropyCalculator(object):
                     * math.log2(NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES)
     
         return entropy
-    
     
     def _calculate_entropy_attribute(self, attr_idx: int) -> float:
         """
@@ -68,7 +64,6 @@ class EntropyCalculator(object):
         
         return attr_entropy
     
-    
     def __get_classes_attribute(self, attr_idx: int) -> List[str]:
         """
         Retrieves all the different classes of a categorical attribute.
@@ -78,17 +73,15 @@ class EntropyCalculator(object):
     
         # Calculate how many in each class
         for d in self.DATA_INSTANCES:
-            attribute_values.append(d.attributes[attr_idx])
+            attribute_values.append(d.attributes[attr_idx].value)
     
         return set(attribute_values)
-
 
     def __get_all_data_instances_for_class(self, attr_idx: int, attr_class: str) -> List[DataInstance]:
         """
         Gets all the data instances of a given class.
         """
-        return [d for d in self.DATA_INSTANCES if d.attributes[attr_idx] == attr_class]
-
+        return [d for d in self.DATA_INSTANCES if d.attributes[attr_idx].value == attr_class]
 
     def __get_target_classes(self, data_instances: List[DataInstance]) -> List[str]:
         """
@@ -103,13 +96,11 @@ class EntropyCalculator(object):
     
         return set(attribute_values)
 
-
     def __get_all_data_instances_for_target_class(self, data_instances: List[DataInstance], target_class: str) -> List[DataInstance]:
         """
         Gets all the data instances for a target value class.
         """
         return [d for d in data_instances if d.target == target_class]
-    
     
     def __calculate_entropy_class(self, data_instances: List[DataInstance]) -> float:
         """
