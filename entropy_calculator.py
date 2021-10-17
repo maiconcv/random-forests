@@ -35,7 +35,7 @@ class EntropyCalculator(object):
         """
         Returns the point of best numerical split for the attribute.
         """
-        if self.DATA_INSTANCES[0].attributes[attr_idx].attr_type == 't':
+        if self.DATA_INSTANCES[0].attributes[attr_idx].attr_type == 'n':
             return self.__get_best_numerical_split(attr_idx)[0]
         else:
             raise Exception("Cannot get best numerical split for categorical attribute")

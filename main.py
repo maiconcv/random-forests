@@ -55,10 +55,9 @@ def read_dataset(file_name: str, delimiter: str = ';') -> Tuple[List[DataInstanc
             lines = csv.reader(data_file, delimiter=delimiter)
             headers = next(lines)
             for line in lines:
-                target = line[-1]  # get last column
-                attribute_values = line[:-1]  # get all but last column
-                attributes = create_attributes(headers[:-1], attribute_values, metadata)
-                data_instances.append(DataInstance(attributes, target))
+                attribute_values = line  # get all but last column
+                attributes = create_attributes(headers, attribute_values, metadata)
+                data_instances.append(DataInstance(attributes))
         return data_instances, headers
     except FileNotFoundError:
         print('Dataset file not found. Exiting...')

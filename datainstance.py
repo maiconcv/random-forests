@@ -25,7 +25,7 @@ class Attribute(object):
 
 
 class DataInstance:
-    def __init__(self, attributes: List[Attribute], target: str):
+    def __init__(self, attributes: List[Attribute]):
         # Get index of target attribute
         target_attr = attributes.pop(
             attributes.index(next(a for a in attributes if a.attr_type == 't')))
