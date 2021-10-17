@@ -2,8 +2,8 @@ import sys
 import csv
 from typing import List, Tuple
 from pathlib import Path
-from .datainstance import DataInstance, Attribute
-from .decision_tree import get_decision_tree
+from datainstance import DataInstance, Attribute
+from decision_tree import get_decision_tree
 
 
 def get_file_name() -> str:
@@ -12,6 +12,22 @@ def get_file_name() -> str:
     except IndexError:
         print('Missing dataset file argument. Exiting...')
         sys.exit()
+
+
+def get_data_headers(headers: List[str], metadata: List[str]) -> List[str]:
+    """
+    Remove the target attribute from the headers leaving only the data attributes.
+    """
+    assert len(headers) == len(metadata)
+
+    new_headers = headers
+
+    for idx in range(len(new_headers)):
+        if metadata[idx] == 't':
+            del new_headers[idx]
+            break
+
+    return new_headers
 
 
 def read_metadata(file_path: str) -> List[str]:
@@ -58,6 +74,9 @@ def read_dataset(file_name: str, delimiter: str = ';') -> Tuple[List[DataInstanc
                 attribute_values = line  # get all but last column
                 attributes = create_attributes(headers, attribute_values, metadata)
                 data_instances.append(DataInstance(attributes))
+            
+            headers = get_data_headers(headers, metadata)
+        
         return data_instances, headers
     except FileNotFoundError:
         print('Dataset file not found. Exiting...')
