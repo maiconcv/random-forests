@@ -89,9 +89,15 @@ def main():
     node = get_decision_tree(data_instances, headers)
     print(node)
 
+    classification = {
+        True: 0,
+        False: 0
+    }
+
     for test_instance in data_instances:
-        classification = node.classify(test_instance)
-        print(classification == test_instance.target)
+        classification_result = node.classify(test_instance)
+        classification[classification_result == test_instance.target.value] += 1
+    print(classification)
 
 
 if __name__ == '__main__':

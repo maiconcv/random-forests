@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any, Tuple
 from datainstance import Attribute, DataInstance
 
 
@@ -25,12 +26,16 @@ class LeafNode(Node):
 
 
 class DecisionNode(Node):
-    def __init__(self, associate_attribute):
+    def __init__(self, associate_attribute, numeric_attribute_value=None):
         self._associate_attribute = associate_attribute
         self._children_nodes = []
+        self._numeric_attribute_value = numeric_attribute_value
 
-    def add_child(self, attribute_value: str, child_node: Node):
+    def add_child(self, attribute_value: Any, child_node: Node) -> None:
         self._children_nodes.append((attribute_value, child_node))
+
+    def set_as_numeric_node(self, numeric_attribute_value: float) -> None:
+        self._numeric_attribute_value = numeric_attribute_value
 
     def classify(self, instance: DataInstance) -> str:
         for instance_attribute in instance.attributes:
@@ -41,12 +46,35 @@ class DecisionNode(Node):
                         + self._associate_attribute)
 
     def _classify_on_correct_child(self, instance: DataInstance, instance_attribute: Attribute) -> str:
+        if self._is_node_associate_to_a_numeric_attribute():
+            return self._classify_on_numeric_node(instance, instance_attribute)
+        else:
+            return self._classify_on_categorical_node(instance, instance_attribute)
+
+    def _is_node_associate_to_a_numeric_attribute(self) -> bool:
+        return self._numeric_attribute_value is not None
+
+    def _classify_on_numeric_node(self, instance: DataInstance, instance_attribute: Attribute) -> str:
+        if instance_attribute.value <= self._numeric_attribute_value:
+            correct_node = self._get_numeric_child_with_split_type('LE')
+        else:
+            correct_node = self._get_numeric_child_with_split_type('BT')
+        return correct_node[1].classify(instance)
+
+    def _get_numeric_child_with_split_type(self, split_type: str) -> Tuple[str, Node]:
+        for child in self._children_nodes:
+            if child[0] == split_type:
+                return child
+
+        raise Exception('Split type not found on any child node. Split type: ' + split_type)
+
+    def _classify_on_categorical_node(self, instance: DataInstance, instance_attribute: Attribute) -> str:
         for child_node in self._children_nodes:
             if child_node[0] == instance_attribute.value:
                 return child_node[1].classify(instance)
 
-        raise Exception('Attribute value of instance not found on any child node. Attribute value: '
-                        + instance_attribute.value + '. Children attribute: ' + self._associate_attribute)
+        raise Exception('Attribute value of instance not matched on any child node. Attribute value: '
+                        + str(instance_attribute.value) + '. Children attribute: ' + self._associate_attribute)
 
     def __str__(self) -> str:
         return 'DecisionNode{' \
