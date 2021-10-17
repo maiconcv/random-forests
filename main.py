@@ -86,7 +86,7 @@ def read_dataset(file_name: str, delimiter: str = ';') -> Tuple[List[DataInstanc
 def main():
     dataset_file_name = get_file_name()
     data_instances, headers = read_dataset(dataset_file_name)
-    node = get_decision_tree(data_instances, headers[0:len(headers) - 1])
+    node = get_decision_tree(data_instances, headers)
     print(node)
 
     for test_instance in data_instances:

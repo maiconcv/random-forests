@@ -1,9 +1,11 @@
 import random
 from copy import deepcopy
+from typing import List
+from datainstance import DataInstance
 
 
 class Bootstrap:
-    def __init__(self, training_set, test_set):
+    def __init__(self, training_set: List[DataInstance], test_set: List[DataInstance]):
         self.training_set = training_set
         self.test_set = test_set
 
@@ -17,14 +19,15 @@ class Bootstrap:
                '}'
 
 
-def bootstraps_with_resampling(dataset, b_bootstraps, seed=None):
+def bootstraps_with_resampling(dataset: List[datainstance], b_bootstraps: int, seed=None) -> List[Bootstrap]:
     bootstraps = []
     for bootstrap_index in range(0, b_bootstraps):
         bootstraps.append(create_bootstrap(dataset, bootstrap_index, seed))
+    
     return bootstraps
 
 
-def create_bootstrap(dataset, bootstrap_index, seed):
+def create_bootstrap(dataset: List[DataInstance], bootstrap_index: int, seed) -> Bootstrap:
     num_instances = len(dataset)
     training_set = []
     test_set = []
