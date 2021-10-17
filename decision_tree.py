@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import List
-from datainstance import DataInstance
-from entropy_calculator import EntropyCalculator
+from .datainstance import DataInstance
+from .entropy_calculator import EntropyCalculator
 
 
 class Node:

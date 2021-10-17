@@ -3,7 +3,7 @@ import csv
 from typing import List, Tuple
 from pathlib import Path
 from .datainstance import DataInstance, Attribute
-from decision_tree import get_decision_tree
+from .decision_tree import get_decision_tree
 
 
 def get_file_name() -> str:
@@ -46,13 +46,13 @@ def create_attributes(header: List[str], attribute_values: List[str], attributes
     return attributes
 
 
-def read_dataset(file_name: str) -> Tuple[List[DataInstance], List[str]]:
+def read_dataset(file_name: str, delimiter: str = ';') -> Tuple[List[DataInstance], List[str]]:
     data_instances = []
     metadata = read_metadata(file_name)
 
     try:
         with open(file_name) as data_file:
-            lines = csv.reader(data_file, delimiter=';')
+            lines = csv.reader(data_file, delimiter=delimiter)
             headers = next(lines)
             for line in lines:
                 target = line[-1]  # get last column

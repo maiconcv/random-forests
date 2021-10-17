@@ -8,6 +8,8 @@ class Attribute(object):
             self.value = value
         elif self.attr_type == 'n':
             self.value = float(value)
+        elif self.attr_type == 't':
+            self.value = value
         else:
             raise Exception("Invalid metadata type")
 
@@ -24,8 +26,11 @@ class Attribute(object):
 
 class DataInstance:
     def __init__(self, attributes: List[Attribute], target: str):
+        # Get index of target attribute
+        target_attr = attributes.pop(
+            attributes.index(next(a for a in attributes if a.attr_type == 't')))
         self.attributes = attributes
-        self.target = target
+        self.target = target_attr
 
     def __repr__(self):
         return str(self)
