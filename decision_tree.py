@@ -1,37 +1,19 @@
 from copy import deepcopy
 from typing import List
-from .datainstance import DataInstance
-from .entropy_calculator import EntropyCalculator
-
-
-class Node:
-    def __init__(self):
-        self.classification_target = None
-        self.children_associate_attribute = None
-        self.children = []
-
-    def set_as_leaf_node(self, target):
-        self.classification_target = target
-
-    def associate_children_to_attribute(self, attribute):
-        self.children_associate_attribute = attribute
-
-    def add_child(self, attribute_value, child_node):
-        self.children.append((attribute_value, child_node))
+from datainstance import DataInstance
+from entropy_calculator import EntropyCalculator
+from tree_node import Node, LeafNode, DecisionNode
 
 
 def get_decision_tree(data_instances: List[DataInstance], attributes: List[str]) -> Node:
-    node = Node()
     if instances_have_the_same_target(data_instances):
-        node.set_as_leaf_node(data_instances[0].target)
-        return node
+        return LeafNode(data_instances[0].target)
 
     if len(attributes) == 0:
-        node.set_as_leaf_node(most_frequent_target_of(data_instances))
-        return node
+        return LeafNode(most_frequent_target_of(data_instances))
 
     attribute_index_with_best_division_criteria = EntropyCalculator(data_instances).best_attribute()
-    node.associate_children_to_attribute(data_instances[0].attributes[attribute_index_with_best_division_criteria].name)
+    node = DecisionNode(data_instances[0].attributes[attribute_index_with_best_division_criteria].name)
     available_attributes = deepcopy(attributes)
     available_attributes.remove(available_attributes[attribute_index_with_best_division_criteria])
 
@@ -39,8 +21,7 @@ def get_decision_tree(data_instances: List[DataInstance], attributes: List[str])
     for attribute_value in possible_values_of_attribute(attribute_index, data_instances):
         new_possible_instances = instances_with_attribute_value(attribute_value, attribute_index, data_instances)
         if len(new_possible_instances) == 0:
-            node.set_as_leaf_node(most_frequent_target_of(data_instances))
-            return node
+            return LeafNode(most_frequent_target_of(data_instances))
         else:
             instances_without_attribute = remove_attribute_from_instances(new_possible_instances, attribute_index)
             new_node = get_decision_tree(instances_without_attribute, available_attributes)
