@@ -1,22 +1,22 @@
 import random
 from itertools import cycle
-from typing import List
+from typing import List, Dict
+from collections import Counter
 from datainstance import DataInstance
 
 
-def cross_validation_division(
-    dataset: List[DataInstance], k_folds: int, r_repetitions: int, seed=None):
+def cross_validation_division(dataset: List[DataInstance], k_folds: int, r_repetitions: int, seed=None):
     repetitions = []
     for repetition in range(r_repetitions):
         if repetition == 0:
             repetition_offset = 0
         else:
-            repetition_offset = get_repetition_offset(dataset, k_folds, seed, repetition)
-        repetitions.append(fold_division(dataset, k_folds, repetition_offset))
+            repetition_offset = _get_repetition_offset(dataset, k_folds, seed, repetition)
+        repetitions.append(_fold_division(dataset, k_folds, repetition_offset))
     return repetitions
 
 
-def get_repetition_offset(dataset, k_folds, seed, repetition):
+def _get_repetition_offset(dataset, k_folds, seed, repetition):
     num_instances = len(dataset)
     fold_size = int(num_instances / k_folds)
     if seed is not None:
@@ -24,7 +24,8 @@ def get_repetition_offset(dataset, k_folds, seed, repetition):
     return random.randint(1, fold_size - 1)
 
 
-def fold_division(dataset, k_folds, repetition_offset):
+def _fold_division(dataset, k_folds, repetition_offset):
+    strata_distribution = _get_strata_distribution(dataset)
     num_instances = len(dataset)
     circular_iterator = cycle(dataset)
     fold_size = int(num_instances / k_folds)
@@ -37,8 +38,16 @@ def fold_division(dataset, k_folds, repetition_offset):
     # create k folds
     for ith_fold in range(k_folds):
         fold = []
-        for ith_element in range(fold_size):
-            fold.append(next(circular_iterator))
+        for strata in strata_distribution.keys():
+            strata_size = int(round(strata_distribution[strata] * fold_size))
+            for ith_element in range(strata_size):
+                el = next(circular_iterator)
+                
+                while el.target.value != strata:
+                    el = next(circular_iterator)    
+                
+                fold.append(el)
+
         folds.append(fold)
 
     # add remaining instances to last fold when num_instances/k_folds is non-integer,
@@ -48,3 +57,13 @@ def fold_division(dataset, k_folds, repetition_offset):
         folds[-1].append(next(circular_iterator))
 
     return folds
+
+def _get_strata_distribution(dataset: List[DataInstance]) -> Dict[str, float]:
+    NUM_INSTANCES = len(dataset)
+    OCCURRENCES = Counter([d.target.value for d in dataset])
+
+    strata_distribution = {}
+    for o in OCCURRENCES:
+        strata_distribution[o] = OCCURRENCES[o] / NUM_INSTANCES
+
+    return strata_distribution
