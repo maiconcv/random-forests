@@ -1,6 +1,6 @@
 import sys
 import csv
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from pathlib import Path
 from .datainstance import DataInstance, Attribute
 from .decision_tree import get_decision_tree
@@ -70,10 +70,12 @@ def read_dataset(file_name: str, delimiter: str = ';') -> Tuple[List[DataInstanc
         with open(file_name) as data_file:
             lines = csv.reader(data_file, delimiter=delimiter)
             headers = next(lines)
+            instance_index = 0
             for line in lines:
                 attribute_values = line  # get all but last column
                 attributes = create_attributes(headers, attribute_values, metadata)
-                data_instances.append(DataInstance(attributes))
+                data_instances.append(DataInstance(instance_index, attributes))
+                instance_index += 1
             
             headers = get_data_headers(headers, metadata)
         
@@ -83,10 +85,30 @@ def read_dataset(file_name: str, delimiter: str = ';') -> Tuple[List[DataInstanc
         sys.exit()
 
 
+def possible_values_of_attributes(data_instances: List[DataInstance]) -> Dict[str, List[str]]:
+    possible_values = {}
+
+    # initialize every attribute with an empty list inside dictionary
+    for attribute in data_instances[0].attributes:
+        possible_values[attribute.name] = []
+
+    # append every attribute value of every instance into the list inside dictionary
+    for instance in data_instances:
+        for attribute in instance.attributes:
+            possible_values[attribute.name].append(attribute.value)
+
+    # transform every attribute list inside dictionary into an unique list
+    for attribute in possible_values:
+        possible_values[attribute] = list(set(possible_values[attribute]))
+
+    return possible_values
+
+
 def main():
     dataset_file_name = get_file_name()
-    data_instances, headers = read_dataset(dataset_file_name)
-    node = get_decision_tree(data_instances, headers)
+    data_instances, headers = read_dataset(dataset_file_name, delimiter='\t')
+    all_values_of_attributes = possible_values_of_attributes(data_instances)
+    node = get_decision_tree(data_instances, headers, all_values_of_attributes)
     print(node)
 
     classification = {

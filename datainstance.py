@@ -1,10 +1,11 @@
 from typing import List
 
+
 class Attribute(object):
     def __init__(self, name: str, value: str, attr_type: str):
         self.name = name
         self.attr_type = attr_type
-        if (self.attr_type == 'c'):
+        if self.attr_type == 'c':
             self.value = value
         elif self.attr_type == 'n':
             self.value = float(value)
@@ -25,18 +26,27 @@ class Attribute(object):
 
 
 class DataInstance:
-    def __init__(self, attributes: List[Attribute]):
+    def __init__(self, instance_id: int, attributes: List[Attribute]):
+        self.id = instance_id
         # Get index of target attribute
         target_attr = attributes.pop(
             attributes.index(next(a for a in attributes if a.attr_type == 't')))
         self.attributes = attributes
         self.target = target_attr
 
-    def __repr__(self):
+    def attribute_with_name(self, attribute_name) -> Attribute:
+        for attribute in self.attributes:
+            if attribute.name == attribute_name:
+                return attribute
+
+        raise Exception('Attribute not found in data instance. Attribute name: ' + attribute_name)
+
+    def __repr__(self) -> str:
         return str(self)
 
     def __str__(self) -> str:
         return 'DataInstance{' \
+               'id=' + str(self.id) + \
                'attributes=' + str(self.attributes) + \
                ', target=' + str(self.target) + \
                '}'

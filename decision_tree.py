@@ -1,11 +1,13 @@
 from copy import deepcopy
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from datainstance import DataInstance
 from entropy_calculator import EntropyCalculator
 from tree_node import Node, LeafNode, DecisionNode
 
 
-def get_decision_tree(data_instances: List[DataInstance], attributes: List[str]) -> Node:
+def get_decision_tree(data_instances: List[DataInstance],
+                      attributes: List[str],
+                      possible_values_for_each_attribute: Dict[str, List[str]]) -> Node:
     if instances_have_the_same_target(data_instances):
         return LeafNode(data_instances[0].target.value)
 
@@ -16,30 +18,31 @@ def get_decision_tree(data_instances: List[DataInstance], attributes: List[str])
     attribute_index_with_best_division_criteria = entropy_calculator.best_attribute()
     node = DecisionNode(data_instances[0].attributes[attribute_index_with_best_division_criteria].name)
     available_attributes = deepcopy(attributes)
-    available_attributes.remove(available_attributes[attribute_index_with_best_division_criteria])
+    attribute_name = available_attributes[attribute_index_with_best_division_criteria]
+    available_attributes.remove(attribute_name)
 
     attribute_index = attribute_index_with_best_division_criteria
     if data_instances[0].attributes[attribute_index].attr_type == 'c':
-        for attribute_value in possible_values_of_attribute(attribute_index, data_instances):
-            new_possible_instances = instances_with_attribute_value(attribute_value, attribute_index, data_instances)
+        for attribute_value in possible_values_for_each_attribute[attribute_name]:
+            new_possible_instances = instances_with_attribute_value(attribute_value, attribute_name, data_instances)
             if len(new_possible_instances) == 0:
                 return LeafNode(most_frequent_target_of(data_instances))
             else:
                 instances_without_attribute = remove_attribute_from_instances(new_possible_instances, attribute_index)
-                new_node = get_decision_tree(instances_without_attribute, available_attributes)
+                new_node = get_decision_tree(instances_without_attribute, available_attributes, possible_values_for_each_attribute)
                 node.add_child(attribute_value, new_node)
         return node
     else:  # numeric
         for split_type_split_point in possible_values_from_numeric_attribute(attribute_index, entropy_calculator):
             attribute_value = split_type_split_point[1]
             split_type = split_type_split_point[0]
-            new_possible_instances = instances_that_are_at_range_of(attribute_value, attribute_index, split_type, data_instances)
+            new_possible_instances = instances_that_are_at_range_of(attribute_value, attribute_name, split_type, data_instances)
             if len(new_possible_instances) == 0:
                 return LeafNode(most_frequent_target_of(data_instances))
             else:
                 node.set_as_numeric_node(attribute_value)
                 instances_without_attribute = remove_attribute_from_instances(new_possible_instances, attribute_index)
-                new_node = get_decision_tree(instances_without_attribute, available_attributes)
+                new_node = get_decision_tree(instances_without_attribute, available_attributes, possible_values_for_each_attribute)
                 node.add_child(split_type, new_node)
         return node
 
@@ -77,17 +80,18 @@ def most_frequent_target_of(data_instances: List[DataInstance]) -> str:
     return most_frequent_target.value
 
 
-def possible_values_of_attribute(attribute_index: int, data_instances: List[DataInstance]) -> List[str]:
+def possible_values_of_attribute(attribute_name: str, data_instances: List[DataInstance]) -> List[str]:
     attribute_values = []
     for instance in data_instances:
-        attribute_values.append(instance.attributes[attribute_index].value)
+        attribute_values.append(instance.attribute_with_name(attribute_name).value)
 
     return list(set(attribute_values))
 
 
 def instances_with_attribute_value(
-        attribute_value: str, attribute_index: int, data_instances: List[DataInstance]) -> List[DataInstance]:
-    return [instance for instance in data_instances if instance.attributes[attribute_index].value == attribute_value]
+        attribute_value: str, attribute_name: str, data_instances: List[DataInstance]) -> List[DataInstance]:
+    return [instance for instance in data_instances
+            if instance.attribute_with_name(attribute_name).value == attribute_value]
 
 
 def remove_attribute_from_instances(data_instances: List[DataInstance], attribute_index: int) -> List[DataInstance]:
@@ -96,19 +100,19 @@ def remove_attribute_from_instances(data_instances: List[DataInstance], attribut
         new_attributes = deepcopy(instance.attributes)
         new_attributes.pop(attribute_index)
         new_attributes.append(instance.target)
-        instances_without_attribute.append(DataInstance(new_attributes))
+        instances_without_attribute.append(DataInstance(instance.id, new_attributes))
     return instances_without_attribute
 
 
 def instances_that_are_at_range_of(attribute_value: float,
-                                   attribute_index: int,
+                                   attribute_name: str,
                                    split_type: str,
                                    data_instances: List[DataInstance]) -> List[DataInstance]:
     new_instances = []
     for instance in data_instances:
-        if split_type == 'LE' and float(instance.attributes[attribute_index].value) <= attribute_value:
+        if split_type == 'LE' and float(instance.attribute_with_name(attribute_name).value) <= attribute_value:
             new_instances.append(instance)
-        elif split_type == 'BT' and float(instance.attributes[attribute_index].value) > attribute_value:
+        elif split_type == 'BT' and float(instance.attribute_with_name(attribute_name).value) > attribute_value:
             new_instances.append(instance)
     return new_instances
 
