@@ -8,6 +8,7 @@ from tree_node import Node, LeafNode, DecisionNode
 def get_decision_tree(data_instances: List[DataInstance],
                       attributes: List[str],
                       possible_values_for_each_attribute: Dict[str, List[str]]) -> Node:
+    
     if instances_have_the_same_target(data_instances):
         return LeafNode(data_instances[0].target.value)
 
@@ -45,6 +46,25 @@ def get_decision_tree(data_instances: List[DataInstance],
                 new_node = get_decision_tree(instances_without_attribute, available_attributes, possible_values_for_each_attribute)
                 node.add_child(split_type, new_node)
         return node
+
+
+def possible_values_of_attributes(data_instances: List[DataInstance]) -> Dict[str, List[str]]:
+    possible_values = {}
+
+    # initialize every attribute with an empty list inside dictionary
+    for attribute in data_instances[0].attributes:
+        possible_values[attribute.name] = []
+
+    # append every attribute value of every instance into the list inside dictionary
+    for instance in data_instances:
+        for attribute in instance.attributes:
+            possible_values[attribute.name].append(attribute.value)
+
+    # transform every attribute list inside dictionary into an unique list
+    for attribute in possible_values:
+        possible_values[attribute] = list(set(possible_values[attribute]))
+
+    return possible_values
 
 
 def instances_have_the_same_target(instances: List[DataInstance]) -> bool:

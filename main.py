@@ -1,9 +1,12 @@
 import sys
 import csv
+import statistics
 from typing import List, Tuple, Dict
 from pathlib import Path
 from data_instance import DataInstance, Attribute
-from decision_tree import get_decision_tree
+from decision_tree import get_decision_tree, possible_values_of_attributes
+from random_forest import RandomForest
+from cross_validation import cross_validation_division
 
 
 def get_file_name() -> str:
@@ -85,41 +88,41 @@ def read_dataset(file_name: str, delimiter: str = ';') -> Tuple[List[DataInstanc
         sys.exit()
 
 
-def possible_values_of_attributes(data_instances: List[DataInstance]) -> Dict[str, List[str]]:
-    possible_values = {}
+def run_cross_validation(folds: List[DataInstance], headers: List[str], num_trees: int):
+    NUM_FOLDS = len(folds)
 
-    # initialize every attribute with an empty list inside dictionary
-    for attribute in data_instances[0].attributes:
-        possible_values[attribute.name] = []
+    test_fold = 0
+    accuracy_list = []
 
-    # append every attribute value of every instance into the list inside dictionary
-    for instance in data_instances:
-        for attribute in instance.attributes:
-            possible_values[attribute.name].append(attribute.value)
+    for i in range(NUM_FOLDS):
+        training_set = [data for i in range(NUM_FOLDS) if i != test_fold for data in folds[i]]
+        forest = RandomForest(training_set, num_trees, headers)
+        # Evaluate performance of forest
+        pred = forest.classify(folds[test_fold])
+        accuracy_list.append(count_equal_elements(pred, [d.target.value for d in folds[test_fold]]) / len(pred))
+        test_fold += 1
 
-    # transform every attribute list inside dictionary into an unique list
-    for attribute in possible_values:
-        possible_values[attribute] = list(set(possible_values[attribute]))
+    return statistics.mean(accuracy_list), statistics.stdev(accuracy_list)
 
-    return possible_values
+
+def count_equal_elements(pred, real):
+    assert len(pred) == len(real)
+
+    count = 0
+
+    for i in range(len(pred)):
+        if pred[i] == real[i]:
+            count += 1
+
+    return count
 
 
 def main():
     dataset_file_name = get_file_name()
     data_instances, headers = read_dataset(dataset_file_name, delimiter='\t')
-    all_values_of_attributes = possible_values_of_attributes(data_instances)
-    node = get_decision_tree(data_instances, headers, all_values_of_attributes)
-    print(node)
-
-    classification = {
-        True: 0,
-        False: 0
-    }
-
-    for test_instance in data_instances:
-        classification_result = node.classify(test_instance)
-        classification[classification_result == test_instance.target.value] += 1
-    print(classification)
+    [folds] = cross_validation_division(data_instances, int(sys.argv[2]), 1)
+    mean, stdev = run_cross_validation(folds, headers, int(sys.argv[3]))
+    print("Accuracy Mean: {0:.3f}%, Standard Dev: {1:.3f}%".format(mean*100, stdev*100))
 
 
 if __name__ == '__main__':
