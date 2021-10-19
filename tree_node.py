@@ -10,7 +10,7 @@ class Node(ABC):
 
 
 class LeafNode(Node):
-    def __init__(self, classification):
+    def __init__(self, classification: str):
         self._classification = classification
 
     def classify(self, instance: DataInstance) -> str:
@@ -26,7 +26,7 @@ class LeafNode(Node):
 
 
 class DecisionNode(Node):
-    def __init__(self, associate_attribute, numeric_attribute_value=None):
+    def __init__(self, associate_attribute: str, numeric_attribute_value: float = None):
         self._associate_attribute = associate_attribute
         self._children_nodes = []
         self._numeric_attribute_value = numeric_attribute_value
@@ -55,7 +55,7 @@ class DecisionNode(Node):
         return self._numeric_attribute_value is not None
 
     def _classify_on_numeric_node(self, instance: DataInstance, instance_attribute: Attribute) -> str:
-        if instance_attribute.value <= self._numeric_attribute_value:
+        if float(instance_attribute.value) <= self._numeric_attribute_value:
             correct_node = self._get_numeric_child_with_split_type('LE')
         else:
             correct_node = self._get_numeric_child_with_split_type('BT')

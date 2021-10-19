@@ -34,7 +34,7 @@ class DataInstance:
         self.attributes = attributes
         self.target = target_attr
 
-    def attribute_with_name(self, attribute_name) -> Attribute:
+    def attribute_with_name(self, attribute_name: str) -> Attribute:
         for attribute in self.attributes:
             if attribute.name == attribute_name:
                 return attribute
