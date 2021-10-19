@@ -1,6 +1,6 @@
 import math
 import operator
-from typing import List
+from typing import List, Set
 from data_instance import DataInstance
 
 
@@ -44,16 +44,16 @@ class EntropyCalculator(object):
         """
         Calculates value of information for the target attribute.
         """
-        VALUE_CLASSES = self.__get_target_classes(self.DATA_INSTANCES)
-        NUM_DATA_INSTANCES = len(self.DATA_INSTANCES)
+        value_classes = self.__get_target_classes(self.DATA_INSTANCES)
+        num_data_instances = len(self.DATA_INSTANCES)
 
         entropy = 0
 
-        for c in VALUE_CLASSES:
-            CLASS_DATA_INSTANCES = self.__get_all_data_instances_for_target_class(self.DATA_INSTANCES, c)
-            NUM_DATA_INSTANCES_FOR_CLASS = len(CLASS_DATA_INSTANCES)
-            entropy -= (NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES) \
-                    * math.log2(NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES)
+        for c in value_classes:
+            class_data_instances = self.__get_all_data_instances_for_target_class(self.DATA_INSTANCES, c)
+            num_data_instances_for_class = len(class_data_instances)
+            entropy -= (num_data_instances_for_class / num_data_instances) \
+                * math.log2(num_data_instances_for_class / num_data_instances)
     
         return entropy
     
@@ -62,22 +62,22 @@ class EntropyCalculator(object):
         Calculate the entropy for an attribute.
         """
         attr_entropy = 0
-        ATTR_TYPE = self.DATA_INSTANCES[0].attributes[attr_idx].attr_type
-        NUM_DATA_INSTANCES = len(self.DATA_INSTANCES)
+        attr_type = self.DATA_INSTANCES[0].attributes[attr_idx].attr_type
+        num_data_instances = len(self.DATA_INSTANCES)
 
-                # Categorical attribute
-        if ATTR_TYPE == 'c':
-            ATTR_CLASSES = self.__get_classes_categorical_attribute(attr_idx)
+        # Categorical attribute
+        if attr_type == 'c':
+            attr_classes = self.__get_classes_categorical_attribute(attr_idx)
                 
             # Calculate each class entropy
-            for c in ATTR_CLASSES:
-                CLASS_DATA_INSTANCES = self.__get_all_data_instances_for_class(attr_idx, c)
-                NUM_DATA_INSTANCES_FOR_CLASS = len(CLASS_DATA_INSTANCES)
-                attr_entropy += (NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES) \
-                            * self.__calculate_entropy_class(CLASS_DATA_INSTANCES)
+            for c in attr_classes:
+                class_data_instances = self.__get_all_data_instances_for_class(attr_idx, c)
+                num_data_instances_for_class = len(class_data_instances)
+                attr_entropy += (num_data_instances_for_class / num_data_instances) \
+                    * self.__calculate_entropy_class(class_data_instances)
         
         # Numerical attribute
-        elif ATTR_TYPE == 'n':
+        elif attr_type == 'n':
             attr_entropy = self.__get_best_numerical_split(attr_idx)[1]
 
         return attr_entropy
@@ -87,40 +87,40 @@ class EntropyCalculator(object):
         Return the split_point and entropy with minimum entropy.
         """
         # Get sorted data instances to evaluate target value boundaries
-        SORTED_DATA_INSTANCES = sorted(self.DATA_INSTANCES, key = lambda x: x.attributes[attr_idx].value)
-        NUM_DATA_INSTANCES = len(SORTED_DATA_INSTANCES)
+        sorted_data_instances = sorted(self.DATA_INSTANCES, key=lambda x: x.attributes[attr_idx].value)
+        num_data_instances = len(sorted_data_instances)
 
         # Possible split points
         possible_splits = []
 
         # Find possible splits
-        for i in range(1, len(SORTED_DATA_INSTANCES)):
+        for i in range(1, len(sorted_data_instances)):
             # If in boundary
-            PREV = SORTED_DATA_INSTANCES[i - 1]
-            CURR = SORTED_DATA_INSTANCES[i]
-            if PREV.target.value != CURR.target.value:
+            prev = sorted_data_instances[i - 1]
+            curr = sorted_data_instances[i]
+            if prev.target.value != curr.target.value:
                 # Create split point
-                possible_splits.append((PREV.attributes[attr_idx].value + \
-                                        CURR.attributes[attr_idx].value) / 2)
+                possible_splits.append((float(prev.attributes[attr_idx].value) +
+                                        float(curr.attributes[attr_idx].value)) / 2)
 
         splits_entropy = {}
 
         # Calculate the entropy for each possible split
         for split in possible_splits:
-            LEQ_INSTANCES, G_INSTANCES = self.__get_all_data_instances_for_numerical_class(attr_idx, split)
+            leq_instances, g_instances = self.__get_all_data_instances_for_numerical_class(attr_idx, split)
 
             split_entropy = 0
             # Calculate each class entropy
-            for SPLIT_INSTANCES in [LEQ_INSTANCES, G_INSTANCES]:
-                NUM_DATA_INSTANCES_FOR_CLASS = len(SPLIT_INSTANCES)
-                split_entropy += (NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES) \
-                            * self.__calculate_entropy_class(SPLIT_INSTANCES)
+            for SPLIT_INSTANCES in [leq_instances, g_instances]:
+                num_data_instances_for_class = len(SPLIT_INSTANCES)
+                split_entropy += (num_data_instances_for_class / num_data_instances) \
+                    * self.__calculate_entropy_class(SPLIT_INSTANCES)
     
             splits_entropy[split] = split_entropy
 
         return min(splits_entropy.items(), key=operator.itemgetter(1))
 
-    def __get_classes_categorical_attribute(self, attr_idx: int) -> List[str]:
+    def __get_classes_categorical_attribute(self, attr_idx: int) -> Set[str]:
         """
         Retrieves all the different classes of an attribute.
         """
@@ -130,10 +130,10 @@ class EntropyCalculator(object):
         """
         Return the splitted data instances for a given split point.
         """
-        LEQ_INSTANCES = [d for d in self.DATA_INSTANCES if d.attributes[attr_idx].value <= split_point]
-        G_INSTANCES = [d for d in self.DATA_INSTANCES if d.attributes[attr_idx].value > split_point]
+        leq_instances = [d for d in self.DATA_INSTANCES if float(d.attributes[attr_idx].value) <= split_point]
+        g_instances = [d for d in self.DATA_INSTANCES if float(d.attributes[attr_idx].value) > split_point]
 
-        return [LEQ_INSTANCES, G_INSTANCES]
+        return [leq_instances, g_instances]
 
     def __get_all_data_instances_for_class(self, attr_idx: int, attr_class: str) -> List[DataInstance]:
         """
@@ -141,7 +141,7 @@ class EntropyCalculator(object):
         """
         return [d for d in self.DATA_INSTANCES if d.attributes[attr_idx].value == attr_class]
 
-    def __get_target_classes(self, data_instances: List[DataInstance]) -> List[str]:
+    def __get_target_classes(self, data_instances: List[DataInstance]) -> Set[str]:
         """
         Get all the different classes for the target attribute.
         """
@@ -164,15 +164,15 @@ class EntropyCalculator(object):
         """
         Calculates the entropy for the data_instances in a given class.
         """
-        TARGET_CLASSES = self.__get_target_classes(data_instances)
-        NUM_DATA_INSTANCES = len(data_instances)
+        target_classes = self.__get_target_classes(data_instances)
+        num_data_instances = len(data_instances)
     
         class_entropy = 0
     
-        for c in TARGET_CLASSES:
-            CLASS_DATA_INSTANCES = self.__get_all_data_instances_for_target_class(data_instances, c)
-            NUM_DATA_INSTANCES_FOR_CLASS = len(CLASS_DATA_INSTANCES)
-            class_entropy -= (NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES) * \
-                        math.log2(NUM_DATA_INSTANCES_FOR_CLASS / NUM_DATA_INSTANCES)
+        for c in target_classes:
+            class_data_instances = self.__get_all_data_instances_for_target_class(data_instances, c)
+            num_data_instances_for_class = len(class_data_instances)
+            class_entropy -= (num_data_instances_for_class / num_data_instances) * \
+                math.log2(num_data_instances_for_class / num_data_instances)
     
         return class_entropy
