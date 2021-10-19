@@ -1,6 +1,6 @@
 from copy import deepcopy
 from typing import List, Tuple, Dict
-from datainstance import DataInstance
+from data_instance import DataInstance
 from entropy_calculator import EntropyCalculator
 from tree_node import Node, LeafNode, DecisionNode
 

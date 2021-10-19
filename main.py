@@ -2,8 +2,8 @@ import sys
 import csv
 from typing import List, Tuple, Dict
 from pathlib import Path
-from .datainstance import DataInstance, Attribute
-from .decision_tree import get_decision_tree
+from data_instance import DataInstance, Attribute
+from decision_tree import get_decision_tree
 
 
 def get_file_name() -> str:

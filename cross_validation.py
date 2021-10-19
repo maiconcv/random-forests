@@ -2,7 +2,7 @@ import random
 from itertools import cycle
 from typing import List, Dict
 from collections import Counter
-from datainstance import DataInstance
+from data_instance import DataInstance
 
 
 def cross_validation_division(dataset: List[DataInstance], k_folds: int, r_repetitions: int, seed=None):

@@ -1,7 +1,7 @@
 import math
 import operator
 from typing import List
-from .datainstance import DataInstance
+from data_instance import DataInstance
 
 
 class EntropyCalculator(object):

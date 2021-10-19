@@ -1,7 +1,7 @@
 import random
 from copy import deepcopy
 from typing import List
-from datainstance import DataInstance
+from data_instance import DataInstance
 
 
 class Bootstrap:

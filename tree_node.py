@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Tuple
-from datainstance import Attribute, DataInstance
+from data_instance import Attribute, DataInstance
 
 
 class Node(ABC):
