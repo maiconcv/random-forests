@@ -1,5 +1,6 @@
 import math
 import operator
+import random
 from typing import List, Set
 from data_instance import DataInstance
 
@@ -12,8 +13,9 @@ class EntropyCalculator(object):
     def __init__(self, data_instances: List[DataInstance]):
         self.DATA_INSTANCES = data_instances
         self.TARGET_INFORMATION_VALUE = self._calculate_entropy_target()
-        self.NUM_ATTRIBUTES = len(self.DATA_INSTANCES[0].attributes)
-    
+        NUM_ATTR_TO_CHOOSE =  int(round(math.sqrt(len(self.DATA_INSTANCES[0].attributes))))
+        self.SELECTED_ATTRIBUTES = random.choices(range(len(self.DATA_INSTANCES[0].attributes)), k=NUM_ATTR_TO_CHOOSE)
+            
     def gain_ID3(self, attr_idx: int) -> float:
         """
         Calculates the information gain for a given data_instances and attribute
@@ -26,7 +28,7 @@ class EntropyCalculator(object):
         """
         info_gain_list = []
 
-        for idx in range(self.NUM_ATTRIBUTES):
+        for idx in self.SELECTED_ATTRIBUTES:
             info_gain_list.append(self.gain_ID3(idx))
 
         return info_gain_list.index(max(info_gain_list))
