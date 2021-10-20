@@ -135,17 +135,24 @@ def generate_data():
     NUM_FOLDS = [5, 10]
     NUM_TREES = [10, 25, 50, 75, 100]
 
+    if not os.path.exists('./results'):
+        os.mkdir('./results/')
+
     for d in datasets_to_run:
         # CSV with results
+        csv_rows = [['k_folds', 'num_trees', 'mean', 'stdev']]
         with open("./results/" + d.stem + ".csv", 'w') as csv_file:
             data_instances, headers = read_dataset(d, delimiter='\t')
             for f in NUM_FOLDS:
                 [folds] = cross_validation_division(data_instances, f, 1)
                 for t in NUM_TREES:
                     mean, stdev = run_cross_validation(folds, headers, t)
+                    csv_rows.append([f, t, mean, stdev])
                     # Throw to csv
                     print("Accuracy Mean: {0:.3f}%, Standard Dev: {1:.3f}%".format(mean*100, stdev*100))
 
+            writer = csv.writer(csv_file)
+            writer.writerows(csv_rows)
 
 if __name__ == '__main__':
     generate_data()
