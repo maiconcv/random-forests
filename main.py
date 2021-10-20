@@ -1,6 +1,7 @@
 import sys
 import csv
 import statistics
+import os
 from typing import List, Tuple, Dict
 from pathlib import Path
 from data_instance import DataInstance, Attribute
@@ -125,5 +126,26 @@ def main():
     print("Accuracy Mean: {0:.3f}%, Standard Dev: {1:.3f}%".format(mean*100, stdev*100))
 
 
+def generate_data():
+    datasets_to_run = []
+    for f in os.listdir("./dataset"):
+        if f.endswith(".tsv"):
+            datasets_to_run.append(Path(os.path.join("./dataset", f)))
+
+    NUM_FOLDS = [5, 10]
+    NUM_TREES = [10, 25, 50, 75, 100]
+
+    for d in datasets_to_run:
+        # CSV with results
+        with open("./results/" + d.stem + ".csv", 'w') as csv_file:
+            data_instances, headers = read_dataset(d, delimiter='\t')
+            for f in NUM_FOLDS:
+                [folds] = cross_validation_division(data_instances, f, 1)
+                for t in NUM_TREES:
+                    mean, stdev = run_cross_validation(folds, headers, t)
+                    # Throw to csv
+                    print("Accuracy Mean: {0:.3f}%, Standard Dev: {1:.3f}%".format(mean*100, stdev*100))
+
+
 if __name__ == '__main__':
-    main()
+    generate_data()
