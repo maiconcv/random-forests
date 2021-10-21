@@ -43,7 +43,7 @@ def _fold_division(dataset, k_folds, repetition_offset):
             for ith_element in range(strata_size):
                 el = next(circular_iterator)
                 
-                while el.target.value != strata:
+                while (el.target.value != strata) or (el in fold):
                     el = next(circular_iterator)    
                 
                 fold.append(el)

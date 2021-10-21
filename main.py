@@ -133,7 +133,7 @@ def generate_data():
             datasets_to_run.append(Path(os.path.join("./dataset", f)))
 
     NUM_FOLDS = [5, 10]
-    NUM_TREES = [10, 25, 50, 75, 100]
+    NUM_TREES = [1, 5, 10, 25, 50, 75, 100]
 
     if not os.path.exists('./results'):
         os.mkdir('./results/')
@@ -149,7 +149,7 @@ def generate_data():
                     mean, stdev = run_cross_validation(folds, headers, t)
                     csv_rows.append([f, t, mean, stdev])
                     # Throw to csv
-                    print("Accuracy Mean: {0:.3f}%, Standard Dev: {1:.3f}%".format(mean*100, stdev*100))
+                    print("Folds {2} Trees {3} - Accuracy Mean: {0:.3f}%, Standard Dev: {1:.3f}%".format(mean*100, stdev*100, f, t))
 
             writer = csv.writer(csv_file)
             writer.writerows(csv_rows)

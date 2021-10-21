@@ -16,14 +16,14 @@ class Attribute(object):
 
     def __str__(self) -> str:
         return "Attribute(" \
-            "name=" + self.name + \
+            ", name=" + self.name + \
             ", value=" + str(self.value) + \
             ", type=" + self.attr_type + \
             "}" 
 
     def __repr__(self) -> str:
         return str(self)
-
+        
 
 class DataInstance:
     def __init__(self, instance_id: int, attributes: List[Attribute]):
@@ -50,3 +50,6 @@ class DataInstance:
                'attributes=' + str(self.attributes) + \
                ', target=' + str(self.target) + \
                '}'
+
+    def __eq__(self, obj):
+        return self.id == obj.id
