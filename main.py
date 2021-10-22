@@ -133,7 +133,7 @@ def generate_data():
             datasets_to_run.append(Path(os.path.join("./dataset", f)))
 
     NUM_FOLDS = [5, 10]
-    NUM_TREES = [10, 25]
+    NUM_TREES = [1, 5, 10, 25, 50, 75, 100]
 
     if not os.path.exists('./results'):
         os.mkdir('./results/')
