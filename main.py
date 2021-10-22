@@ -2,12 +2,12 @@ import sys
 import csv
 import statistics
 import os
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 from pathlib import Path
 from data_instance import DataInstance, Attribute
-from decision_tree import get_decision_tree, possible_values_of_attributes
 from random_forest import RandomForest
 from cross_validation import cross_validation_division
+from constants import TARGET
 
 
 def get_file_name() -> str:
@@ -27,7 +27,7 @@ def get_data_headers(headers: List[str], metadata: List[str]) -> List[str]:
     new_headers = headers
 
     for idx in range(len(new_headers)):
-        if metadata[idx] == 't':
+        if metadata[idx] == TARGET:
             del new_headers[idx]
             break
 
@@ -133,7 +133,7 @@ def generate_data():
             datasets_to_run.append(Path(os.path.join("./dataset", f)))
 
     NUM_FOLDS = [5, 10]
-    NUM_TREES = [1, 5, 10, 25, 50, 75, 100]
+    NUM_TREES = [10, 25]
 
     if not os.path.exists('./results'):
         os.mkdir('./results/')
@@ -153,6 +153,7 @@ def generate_data():
 
             writer = csv.writer(csv_file)
             writer.writerows(csv_rows)
+
 
 if __name__ == '__main__':
     generate_data()

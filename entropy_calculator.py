@@ -37,7 +37,7 @@ class EntropyCalculator(object):
         """
         Returns the point of best numerical split for the attribute.
         """
-        if self.DATA_INSTANCES[0].attributes[attr_idx].attr_type == 'n':
+        if self.DATA_INSTANCES[0].attributes[attr_idx].is_numeric():
             return self.__get_best_numerical_split(attr_idx)[0]
         else:
             raise Exception("Cannot get best numerical split for categorical attribute")
@@ -64,11 +64,11 @@ class EntropyCalculator(object):
         Calculate the entropy for an attribute.
         """
         attr_entropy = 0
-        attr_type = self.DATA_INSTANCES[0].attributes[attr_idx].attr_type
+        attribute = self.DATA_INSTANCES[0].attributes[attr_idx]
         num_data_instances = len(self.DATA_INSTANCES)
 
         # Categorical attribute
-        if attr_type == 'c':
+        if attribute.is_categorical():
             attr_classes = self.__get_classes_categorical_attribute(attr_idx)
                 
             # Calculate each class entropy
@@ -79,7 +79,7 @@ class EntropyCalculator(object):
                     * self.__calculate_entropy_class(class_data_instances)
         
         # Numerical attribute
-        elif attr_type == 'n':
+        elif attribute.is_numeric():
             attr_entropy = self.__get_best_numerical_split(attr_idx)[1]
 
         return attr_entropy

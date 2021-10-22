@@ -1,6 +1,4 @@
 from collections import Counter
-from typing import List
-from data_instance import DataInstance
 from decision_tree import get_decision_tree, possible_values_of_attributes
 from bootstrap import *
 

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Tuple
 from data_instance import Attribute, DataInstance
+from constants import LESS_OR_EQUAL, BIGGER_THAN
 
 
 class Node(ABC):
@@ -56,9 +57,9 @@ class DecisionNode(Node):
 
     def _classify_on_numeric_node(self, instance: DataInstance, instance_attribute: Attribute) -> str:
         if float(instance_attribute.value) <= self._numeric_attribute_value:
-            correct_node = self._get_numeric_child_with_split_type('LE')
+            correct_node = self._get_numeric_child_with_split_type(LESS_OR_EQUAL)
         else:
-            correct_node = self._get_numeric_child_with_split_type('BT')
+            correct_node = self._get_numeric_child_with_split_type(BIGGER_THAN)
         return correct_node[1].classify(instance)
 
     def _get_numeric_child_with_split_type(self, split_type: str) -> Tuple[str, Node]:

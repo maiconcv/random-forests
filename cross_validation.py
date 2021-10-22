@@ -58,12 +58,13 @@ def _fold_division(dataset, k_folds, repetition_offset):
 
     return folds
 
+
 def _get_strata_distribution(dataset: List[DataInstance]) -> Dict[str, float]:
-    NUM_INSTANCES = len(dataset)
-    OCCURRENCES = Counter([d.target.value for d in dataset])
+    num_instances = len(dataset)
+    occurrences = Counter([d.target.value for d in dataset])
 
     strata_distribution = {}
-    for o in OCCURRENCES:
-        strata_distribution[o] = OCCURRENCES[o] / NUM_INSTANCES
+    for o in occurrences:
+        strata_distribution[o] = occurrences[o] / num_instances
 
     return strata_distribution
