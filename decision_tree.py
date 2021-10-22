@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import List, Tuple, Dict
 from data_instance import DataInstance
 from entropy_calculator import EntropyCalculator
-from tree_node import Node, LeafNode, DecisionNode
+from tree_node import Node, LeafNode, DecisionNode, TreeBranch
 from constants import LESS_OR_EQUAL, BIGGER_THAN
 
 
@@ -32,12 +32,10 @@ def get_decision_tree(data_instances: List[DataInstance],
             else:
                 instances_without_attribute = remove_attribute_from_instances(new_possible_instances, attribute_index)
                 new_node = get_decision_tree(instances_without_attribute, available_attributes, possible_values_for_each_attribute)
-                node.add_child(attribute_value, new_node)
+                node.add_branch(TreeBranch(attribute_value, new_node))
         return node
     else:  # is numeric
-        for split_type_split_point in possible_values_from_numeric_attribute(attribute_index, entropy_calculator):
-            attribute_value = split_type_split_point[1]
-            split_type = split_type_split_point[0]
+        for split_type, attribute_value in possible_values_from_numeric_attribute(attribute_index, entropy_calculator):
             new_possible_instances = instances_that_are_at_range_of(attribute_value, attribute_name, split_type, data_instances)
             if len(new_possible_instances) == 0:
                 return LeafNode(most_frequent_target_of(data_instances))
@@ -45,7 +43,7 @@ def get_decision_tree(data_instances: List[DataInstance],
                 node.set_as_numeric_node(attribute_value)
                 instances_without_attribute = remove_attribute_from_instances(new_possible_instances, attribute_index)
                 new_node = get_decision_tree(instances_without_attribute, available_attributes, possible_values_for_each_attribute)
-                node.add_child(split_type, new_node)
+                node.add_branch(TreeBranch(split_type, new_node))
         return node
 
 
