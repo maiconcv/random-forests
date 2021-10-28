@@ -132,7 +132,7 @@ def generate_data():
         if f.endswith(".tsv"):
             datasets_to_run.append(Path(os.path.join("./dataset", f)))
 
-    NUM_FOLDS = [5, 10]
+    NUM_FOLDS = [3, 5, 7, 10]
     NUM_TREES = [1, 5, 10, 25, 50, 75, 100]
 
     if not os.path.exists('./results'):
