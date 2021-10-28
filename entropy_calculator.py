@@ -31,7 +31,7 @@ class EntropyCalculator(object):
         for idx in self.SELECTED_ATTRIBUTES:
             info_gain_list.append(self.gain_ID3(idx))
 
-        return info_gain_list.index(max(info_gain_list))
+        return self.SELECTED_ATTRIBUTES[info_gain_list.index(max(info_gain_list))]
 
     def best_numerical_split_point(self, attr_idx: int) -> float:
         """
