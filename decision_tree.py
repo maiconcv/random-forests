@@ -99,14 +99,6 @@ def most_frequent_target_of(data_instances: List[DataInstance]) -> str:
     return most_frequent_target.value
 
 
-def possible_values_of_attribute(attribute_name: str, data_instances: List[DataInstance]) -> List[str]:
-    attribute_values = []
-    for instance in data_instances:
-        attribute_values.append(instance.attribute_with_name(attribute_name).value)
-
-    return list(set(attribute_values))
-
-
 def instances_with_attribute_value(
         attribute_value: str, attribute_name: str, data_instances: List[DataInstance]) -> List[DataInstance]:
     return [instance for instance in data_instances
